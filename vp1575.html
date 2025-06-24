@@ -513,15 +513,14 @@ console.log('★スクリプト読み込み開始！');
                         // list.txtから最新の画像URLを取得して表示
                         fetch(s3BaseUrl + 'list.txt')			
                             .then(response => response.text())
-                            .then(data => {
-				console.log('list.txt の読み込み成功:', text);
+                            .then(text => {
+				console.log('list.txt の読み込み成功:', text); // ← ここに入れる！
+				    
                                 const lines = data.trim().split('\n');
                                 if (lines.length > 0) {
                                     const [title, fileName] = lines[0].trim().split(/\s+/);
+				　　console.log('画像ファイル名:', fileName);
                                     // 画像を更新
-					// ✅ デバッグログを出力
-            			   console.log('画像ファイル名:', trimmedFileName);
-            			   console.log('設定された src:', document.getElementById('game-image').src);
 				    const trimmedFileName = fileName.trim();
             			    const imgSrc = fileName.startsWith('http') ? fileName : s3BaseUrl + fileName.trim();
         			    document.getElementById('game-image').src = imgSrc;
@@ -545,8 +544,8 @@ console.log('★スクリプト読み込み開始！');
             fetch(s3BaseUrl + 'list.txt')
 		    
                 .then(response => response.text())
-                .then(data => {
-		console.log('list.txt の読み込み成功:', text);
+                .then(text => {
+		　　console.log('list.txt の読み込み成功:', text); // ← ここに入れる！
                     const lines = data.trim().split('\n');
                     let recentScreenshotFound = false;
 
@@ -798,8 +797,8 @@ console.log('★スクリプト読み込み開始！');
                             // 現在の最新画像URLを取得
                             fetch(s3BaseUrl + 'list.txt')				    
                                 .then(response => response.text())
-                                .then(data => {
-					console.log('list.txt の読み込み成功:', text);
+                                .then(text => {
+    				　　console.log('list.txt の読み込み成功:', text); // ← ここに入れる！
                                     const lines = data.trim().split('\n');
                                     let currentImageUrl = '';
                                     
@@ -821,7 +820,7 @@ console.log('★スクリプト読み込み開始！');
                                         fetch(s3BaseUrl + 'list.txt')					
                                             .then(response => response.text())
                                             .then(newData => {
-						    console.log('list.txt の読み込み成功:', text);
+						console.log('list.txt の読み込み成功:', text); // ← ここに入れる！
                                                 const newLines = newData.trim().split('\n');
                                                 
                                                 if (newLines.length > 0) {
