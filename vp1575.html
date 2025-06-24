@@ -513,12 +513,10 @@
                                 if (lines.length > 0) {
                                     const [title, fileName] = lines[0].split(' ');
                                     // 画像を更新
-                                    //document.getElementById('game-image').src = fileName.trim();
-                                    //console.log('最新の画像に更新しました: ' + fileName.trim());
-
 				    const trimmedFileName = fileName.trim();
             			    document.getElementById('game-image').src = trimmedFileName;
-
+				    console.log('最新の画像に更新しました: ' + fileName.trim());
+					
 		                   // ✅ デバッグログを出力
             			   console.log('画像ファイル名:', trimmedFileName);
             			   console.log('設定された src:', document.getElementById('game-image').src);
@@ -897,7 +895,6 @@
         <p id="tap-anywhere">画像の任意の場所をタップできます（20秒待ちます）</p>
         
         <div id="image-container">
-            //<img id="game-image" src="screenshot2.jpg" alt="ゲームスクリーンショット">
 	    <img id="game-image" alt="ゲームスクリーンショット">
             <div id="spinner-overlay">
                 <div class="spinner"></div>
