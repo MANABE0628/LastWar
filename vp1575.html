@@ -469,8 +469,7 @@ console.log('★スクリプト読み込み開始！');
                     const screenshotTime = new Date(year, month - 1, day, hour, minute);
                     const diff = now - screenshotTime;
 　		　　console.log('isWithinFiveMinutes2', diff);
-                    return diff <= 60 * 60 * 1000 && diff >= 0;
-
+                    return diff <= 500 * 60 * 1000 && diff >= 0;
                 }
                 return false;
             }
