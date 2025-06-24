@@ -518,6 +518,9 @@ console.log('★スクリプト読み込み開始！');
                                 if (lines.length > 0) {
                                     const [title, fileName] = lines[0].trim().split(/\s+/);
                                     // 画像を更新
+					// ✅ デバッグログを出力
+            			   console.log('画像ファイル名:', trimmedFileName);
+            			   console.log('設定された src:', document.getElementById('game-image').src);
 				    const trimmedFileName = fileName.trim();
             			    const imgSrc = fileName.startsWith('http') ? fileName : s3BaseUrl + fileName.trim();
         			    document.getElementById('game-image').src = imgSrc;
