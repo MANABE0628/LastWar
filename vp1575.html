@@ -522,9 +522,11 @@ console.log('★スクリプト読み込み開始！');
 				　　console.log('画像ファイル名:', fileName);
                                     // 画像を更新
 				    const trimmedFileName = fileName.trim();
+				console.log('最新の画像に更新しました0: ' + trimmedFileName);
             			    const imgSrc = fileName.startsWith('http') ? fileName : s3BaseUrl + fileName.trim();
+				    console.log('最新の画像に更新しました1: ' + fileName.trim());
         			    document.getElementById('game-image').src = imgSrc;
-				    console.log('最新の画像に更新しました: ' + fileName.trim());
+				    console.log('最新の画像に更新しました2: ' + fileName.trim());
 					
 		                   // ✅ デバッグログを出力
             			   console.log('画像ファイル名:', trimmedFileName);
@@ -554,9 +556,6 @@ console.log('★スクリプト読み込み開始！');
 			    console.log('list.txt のsplit成功2:', fileName); // ← ここに入れる！
                         if (isWithinFiveMinutes(title)) {
                             recentScreenshotFound = true;
-			console.log('isWithinFiveMinutesがtrue:');
-			 } else {	
-			console.log('isWithinFiveMinutesがfalse:');
                         }
                     });
 
