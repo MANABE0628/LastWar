@@ -485,8 +485,8 @@ console.log('★スクリプト読み込み開始！');
 
             fetch(s3BaseUrl + 'vpflg.txt')
                 .then(response => response.text())
-                .then(data => {
-                    const content = data.trim();
+                .then(text => {
+                    const content = text.trim();
                     if (content === '3') {
                         overlayDiv.style.display = 'flex';
                         overlayDiv.textContent = "強制再起動中です。しばらくお待ちください。";
@@ -516,7 +516,7 @@ console.log('★スクリプト読み込み開始！');
                             .then(text => {
 				console.log('list.txt の読み込み成功:', text); // ← ここに入れる！
 				    
-                                const lines = data.trim().split('\n');
+                                const lines = text.trim().split('\n');
                                 if (lines.length > 0) {
                                     const [title, fileName] = lines[0].trim().split(/\s+/);
 				　　console.log('画像ファイル名:', fileName);
@@ -546,7 +546,7 @@ console.log('★スクリプト読み込み開始！');
                 .then(response => response.text())
                 .then(text => {
 		　　console.log('list.txt の読み込み成功:', text); // ← ここに入れる！
-                    const lines = data.trim().split('\n');
+                    const lines = text.trim().split('\n');
                     let recentScreenshotFound = false;
 
                     lines.forEach(line => {
@@ -799,7 +799,7 @@ console.log('★スクリプト読み込み開始！');
                                 .then(response => response.text())
                                 .then(text => {
     				　　console.log('list.txt の読み込み成功:', text); // ← ここに入れる！
-                                    const lines = data.trim().split('\n');
+                                    const lines = text.trim().split('\n');
                                     let currentImageUrl = '';
                                     
                                     if (lines.length > 0) {
@@ -819,9 +819,9 @@ console.log('★スクリプト読み込み開始！');
                                         // list.txtを取得して最新画像をチェック
                                         fetch(s3BaseUrl + 'list.txt')					
                                             .then(response => response.text())
-                                            .then(newData => {
+                                            .then(newtext => {
 						console.log('list.txt の読み込み成功:', text); // ← ここに入れる！
-                                                const newLines = newData.trim().split('\n');
+                                                const newLines = newtext.trim().split('\n');
                                                 
                                                 if (newLines.length > 0) {
                                                     const [newTitle, newFileName] = newLines[0].split(' ');
