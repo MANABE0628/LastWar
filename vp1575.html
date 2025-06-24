@@ -515,9 +515,7 @@ console.log('★スクリプト読み込み開始！');
                         // list.txtから最新の画像URLを取得して表示
                         fetch(s3BaseUrl + 'list.txt')			
                             .then(response => response.text())
-                            .then(text => {
-				console.log('list.txt の読み込み成功:', text); // ← ここに入れる！
-				    
+                            .then(text => {				    
                                 const lines = text.trim().split('\n');
                                 if (lines.length > 0) {
                                     const [title, fileName] = lines[0].trim().split(/\s+/);
@@ -547,9 +545,7 @@ console.log('★スクリプト読み込み開始！');
 		    
                 .then(response => response.text())
                 .then(text => {
-		　　console.log('list.txt の読み込み成功:', text); // ← ここに入れる！
                     const lines = text.trim().split('\n');
-		　　console.log('list.txt のsplit成功1:', lines); // ← ここに入れる！
                     let recentScreenshotFound = false;
 
                     lines.forEach(line => {
