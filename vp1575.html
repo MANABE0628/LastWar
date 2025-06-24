@@ -516,6 +516,8 @@ console.log('★スクリプト読み込み開始！');
                             .then(response => response.text())
                             .then(text => {				    
                                 const lines = text.trim().split('\n');
+				console.log('aaaaaaaaa', lines.length);
+				    
                                 if (lines.length > 0) {
                                     const [title, fileName] = lines[0].trim().split(/\s+/);
 				　　console.log('画像ファイル名:', fileName);
