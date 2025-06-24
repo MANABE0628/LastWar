@@ -512,6 +512,7 @@ console.log('★スクリプト読み込み開始！');
                         
                         // list.txtから最新の画像URLを取得して表示
                         fetch(s3BaseUrl + 'list.txt')
+			console.log('list.txt の読み込み成功:', text);
                             .then(response => response.text())
                             .then(data => {
                                 const lines = data.trim().split('\n');
@@ -542,6 +543,7 @@ console.log('★スクリプト読み込み開始！');
                 });
 
             fetch(s3BaseUrl + 'list.txt')
+		    console.log('list.txt の読み込み成功:', text);
                 .then(response => response.text())
                 .then(data => {
                     const lines = data.trim().split('\n');
@@ -794,6 +796,7 @@ console.log('★スクリプト読み込み開始！');
                             
                             // 現在の最新画像URLを取得
                             fetch(s3BaseUrl + 'list.txt')
+				    console.log('list.txt の読み込み成功:', text);
                                 .then(response => response.text())
                                 .then(data => {
                                     const lines = data.trim().split('\n');
@@ -815,6 +818,7 @@ console.log('★スクリプト読み込み開始！');
                                         
                                         // list.txtを取得して最新画像をチェック
                                         fetch(s3BaseUrl + 'list.txt')
+					console.log('list.txt の読み込み成功:', text);
                                             .then(response => response.text())
                                             .then(newData => {
                                                 const newLines = newData.trim().split('\n');
