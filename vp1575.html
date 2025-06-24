@@ -553,8 +553,6 @@ console.log('★スクリプト読み込み開始！');
 
                     lines.forEach(line => {
                         const [title, fileName] = line.trim().split(/\s+/);
-			    console.log('list.txt のsplit成功2:', title); // ← ここに入れる！
-			    console.log('list.txt のsplit成功2:', fileName); // ← ここに入れる！
                         if (isWithinFiveMinutes(title)) {
                             recentScreenshotFound = true;
                         }
