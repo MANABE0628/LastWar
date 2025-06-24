@@ -514,7 +514,8 @@
                                     const [title, fileName] = lines[0].split(' ');
                                     // 画像を更新
 				    const trimmedFileName = fileName.trim();
-            			    document.getElementById('game-image').src = trimmedFileName;
+            			    const imgSrc = fileName.startsWith('http') ? fileName : s3BaseUrl + fileName.trim();
+        			    document.getElementById('game-image').src = imgSrc;
 				    console.log('最新の画像に更新しました: ' + fileName.trim());
 					
 		                   // ✅ デバッグログを出力
