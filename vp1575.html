@@ -463,12 +463,11 @@ console.log('★スクリプト読み込み開始！');
 
             function isWithinFiveMinutes(title) {
                 const match = title.match(/(\d{4})年(\d{2})月(\d{2})日(\d{2})時(\d{2})分/);
-		console.log('isWithinFiveMinutes1', match);
                 if (match) {
                     const [_, year, month, day, hour, minute] = match;
                     const screenshotTime = new Date(year, month - 1, day, hour, minute);
                     const diff = now - screenshotTime;
-　		　　console.log('isWithinFiveMinutes2', diff);
+
                     return diff <= 500 * 60 * 1000 && diff >= 0;
                 }
                 return false;
