@@ -513,9 +513,8 @@
                                 if (lines.length > 0) {
                                     const [title, fileName] = lines[0].split(' ');
                                     // 画像を更新
-                                    //document.getElementById('game-image').src = fileName.trim();
-                                    document.getElementById('game-image').src = s3BaseUrl + fileName.trim();
-				    console.log('最新の画像に更新しました: ' + fileName.trim());
+                                    document.getElementById('game-image').src = fileName.trim();
+                                    console.log('最新の画像に更新しました: ' + fileName.trim());
                                 }
                             })
                             .catch(error => {
