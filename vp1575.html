@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-
-<script>
-console.log('★スクリプト読み込み開始！');
-</script>	
-	
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>1575副大統領状況</title>
@@ -131,6 +126,10 @@ console.log('★スクリプト読み込み開始！');
             left: auto;
             width: 100%;
         }
+	/* 強制再起動ボタンを常に非表示にする */
+	#restartButton {
+	    display: none !important;
+	}
         button.danger:active {
             background-color: #cc0000;
         }
@@ -467,8 +466,7 @@ console.log('★スクリプト読み込み開始！');
                     const [_, year, month, day, hour, minute] = match;
                     const screenshotTime = new Date(year, month - 1, day, hour, minute);
                     const diff = now - screenshotTime;
-
-                    return diff <= 500 * 60 * 1000 && diff >= 0;
+                    return diff <= 3 * 60 * 1000 && diff >= 0;
                 }
                 return false;
             }
@@ -486,8 +484,8 @@ console.log('★スクリプト読み込み開始！');
 
             fetch(s3BaseUrl + 'vpflg.txt')
                 .then(response => response.text())
-                .then(text => {
-                    const content = text.trim();
+                .then(data => {
+                    const content = data.trim();
                     if (content === '3') {
                         overlayDiv.style.display = 'flex';
                         overlayDiv.textContent = "強制再起動中です。しばらくお待ちください。";
@@ -512,24 +510,21 @@ console.log('★スクリプト読み込み開始！');
                         document.getElementById('maintenanceButton').style.display = 'none'; // メンテナンスモードにするボタン
                         
                         // list.txtから最新の画像URLを取得して表示
-                        fetch(s3BaseUrl + 'list.txt')			
+                        fetch(s3BaseUrl + 'list.txt')
                             .then(response => response.text())
-                            .then(textdata1 => {				    
-                                const lines = textdata1.trim().split('\n');
-				console.log('aaaaaaaaa', lines.length);
-				    
+                            .then(data => {
+                                const lines = data.trim().split('\n');
                                 if (lines.length > 0) {
-                                    const [title, fileName] = lines[0].trim().split(/\s+/);
-				　　console.log('画像ファイル名:', fileName);
+                                    const [title, fileName] = lines[0].split(' ');
                                     // 画像を更新
+                                    document.getElementById('game-image').src = fileName.trim();
+                                    console.log('最新の画像に更新しました: ' + fileName.trim());
+
 				    const trimmedFileName = fileName.trim();
-				console.log('最新の画像に更新しました0: ' + trimmedFileName);
-            			    const imgSrc = fileName.startsWith('http') ? fileName : s3BaseUrl + fileName.trim();
-				    console.log('最新の画像に更新しました1: ' + fileName.trim());
-        			    document.getElementById('game-image').src = imgSrc;
-				    console.log('最新の画像に更新しました2: ' + fileName.trim());
-					
-		                   // ✅ デバッグログを出力
+            			    console.log('画像URLを設定します:', trimmedFileName);
+            			    document.getElementById('game-image').src = trimmedFileName;
+
+		                   // デバッグログを出力
             			   console.log('画像ファイル名:', trimmedFileName);
             			   console.log('設定された src:', document.getElementById('game-image').src);
 
@@ -545,14 +540,13 @@ console.log('★スクリプト読み込み開始！');
                 });
 
             fetch(s3BaseUrl + 'list.txt')
-		    
                 .then(response => response.text())
-                .then(textdata2 => {
-                    const lines = textdata2.trim().split('\n');
+                .then(data => {
+                    const lines = data.trim().split('\n');
                     let recentScreenshotFound = false;
 
                     lines.forEach(line => {
-                        const [title, fileName] = line.trim().split(/\s+/);
+                        const [title, fileName] = line.split(' ');
                         if (isWithinFiveMinutes(title)) {
                             recentScreenshotFound = true;
                         }
@@ -621,7 +615,7 @@ console.log('★スクリプト読み込み開始！');
 
             document.querySelector('#restartButton').addEventListener('click', () => {
                 const password = prompt(translations[currentLang].passwordPrompt);
-                if (password === 'S0Y') {
+                if (password === 'RuuN') {
                     uploadFile('3')
                         .then(() => {
                             alert(translations[currentLang].restartStarted);
@@ -797,15 +791,14 @@ console.log('★スクリプト読み込み開始！');
                             console.log('BlueStacks座標を保存しました: ' + coordinatesData);
                             
                             // 現在の最新画像URLを取得
-                            fetch(s3BaseUrl + 'list.txt')				    
+                            fetch(s3BaseUrl + 'list.txt')
                                 .then(response => response.text())
-                                .then(textdata3 => {
-    				　　console.log('list.txt の読み込み成功:', textdata3); // ← ここに入れる！
-                                    const lines = textdata3.trim().split('\n');
+                                .then(data => {
+                                    const lines = data.trim().split('\n');
                                     let currentImageUrl = '';
                                     
                                     if (lines.length > 0) {
-                                        const [title, fileName] = lines[0].trim().split(/\s+/);
+                                        const [title, fileName] = lines[0].split(' ');
                                         currentImageUrl = fileName.trim();
                                     }
                                     
@@ -819,11 +812,10 @@ console.log('★スクリプト読み込み開始！');
                                         checkCount++;
                                         
                                         // list.txtを取得して最新画像をチェック
-                                        fetch(s3BaseUrl + 'list.txt')					
+                                        fetch(s3BaseUrl + 'list.txt')
                                             .then(response => response.text())
-                                            .then(textdata4 => {
-						console.log('list.txt の読み込み成功:', textdata4); // ← ここに入れる！
-                                                const newLines = textdata4.trim().split('\n');
+                                            .then(newData => {
+                                                const newLines = newData.trim().split('\n');
                                                 
                                                 if (newLines.length > 0) {
                                                     const [newTitle, newFileName] = newLines[0].split(' ');
@@ -910,6 +902,7 @@ console.log('★スクリプト読み込み開始！');
         <p id="tap-anywhere">画像の任意の場所をタップできます（20秒待ちます）</p>
         
         <div id="image-container">
+            //<img id="game-image" src="screenshot2.jpg" alt="ゲームスクリーンショット">
 	    <img id="game-image" alt="ゲームスクリーンショット">
             <div id="spinner-overlay">
                 <div class="spinner"></div>
