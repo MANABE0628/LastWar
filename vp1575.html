@@ -521,8 +521,9 @@
                                     console.log('最新の画像に更新しました: ' + fileName.trim());
 
 				    const trimmedFileName = fileName.trim();
-            			    console.log('画像URLを設定します:', trimmedFileName);
-            			    document.getElementById('game-image').src = trimmedFileName;
+				    const fullUrl = trimmedFileName + '?t=' + new Date().getTime();  // キャッシュ回避クエリ付き！
+            			    console.log('画像URLを設定します:', fullUrl);
+            			    document.getElementById('game-image').src = fullUrl;
 
 		                   // デバッグログを出力
             			   console.log('画像ファイル名:', trimmedFileName);
