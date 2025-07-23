@@ -337,7 +337,7 @@
                 appointSet: "副大統領の任命を設定しました。少しお待ちください。",
                 kickSent: "キックコマンドを送信しました。少しお待ちください。",
                 settingFailed: "設定に失敗しました: ",
-                switchingToMaintenance: "メンテナンスモードに切り替えています。10秒待ってください。"
+                switchingToMaintenance: "メンテナンスモードに切り替えています。40秒待ってください。"
             },
             zh: {
                 title: "1575自动副总统",
@@ -638,10 +638,10 @@
                 
                 uploadFile('4')
                     .then(() => {
-                        // 10秒後に自動的に画面をリロード
+                        // 40秒後に自動的に画面をリロード
                         setTimeout(() => {
                             window.location.reload();
-                        }, 10000);
+                        }, 40000);
                     })
                     .catch(err => {
                         alert(translations[currentLang].settingFailed + err);
@@ -731,8 +731,8 @@
                     const naturalHeight = image.naturalHeight;
                     
                     // BlueStacksの実際の画像サイズ（クライアント領域）
-                    const BLUESTACKS_IMAGE_WIDTH = 1920;    // 画像の幅384
-                    const BLUESTACKS_IMAGE_HEIGHT = 1008;   // 画像の高さ687
+                    const BLUESTACKS_IMAGE_WIDTH = 1880;    // 画像の幅384
+                    const BLUESTACKS_IMAGE_HEIGHT = 968;   // 画像の高さ687
                     
                     // 表示画像上のクリック位置を、実際の画像サイズに変換
                     const imageX = Math.round((x / displayedWidth) * BLUESTACKS_IMAGE_WIDTH);
