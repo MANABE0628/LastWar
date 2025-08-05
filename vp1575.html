@@ -94,13 +94,18 @@
             margin: 15px 0;
             -webkit-tap-highlight-color: transparent;
         }
-        /* 一度だけ任命するボタンの下に余白を追加 */
+        
         #appointButton {
-            margin-bottom: 200px;
+            /* margin-bottom: 50px; */
         }
-        /* キックするボタンを非表示 */
+        /* キックボタンの下に余白を追加 */
         #kickButton {
-            display: none;
+            /* display: none; */
+            margin-bottom: 50px;
+        }
+        /* メンテナンスボタンの下に余白を追加 */
+        #maintenanceButton {
+            margin-bottom: 50px;
         }
         button.gray {
             background-color: #888;
@@ -128,7 +133,7 @@
         }
 	/* 強制再起動ボタンを常に非表示にする */
 	#restartButton {
-	    display: none !important;
+	    /* display: none !important; */
 	}
         button.danger:active {
             background-color: #cc0000;
@@ -316,12 +321,12 @@
                 status: "稼働状況：",
                 running: "【自動副大統領起動中】",
                 stopped: "【自動副大統領停止中】",
-                appoint: "副大統領を一度だけ任命する",
-                kick: "候補者をキックする",
+                appoint: "先頭の副大統領候補者を任命",
+                kick: "先頭の副大統領候補者をキック(実装テスト中)",
                 maintenance: "メンテナンスモードにする",
                 maintenanceMode: "メンテナンスモード中です",
                 endMaintenance: "メンテナンスモード終了",
-                restart: "強制再起動",
+                restart: "強制再起動(メンテナンスモードが使えない場合に使用ください)",
                 tapInstruction: "タップ指示",
                 tapAnywhere: "画像の任意の場所をタップできます（20秒待ちます）",
                 tapPosition: "ここにクリック位置が表示されます",
@@ -893,8 +898,8 @@
     <div id="maintenance" style="display: none;"></div>
     <div id="notification"></div> 
     <p><span id="status-label">稼働状況：</span><span id="status"></span></p>
-    <button id="appointButton">副大統領を一度だけ任命する</button>
-    <button id="kickButton" class="gray">候補者をキックする</button>
+    <button id="appointButton">先頭の副大統領候補者を任命</button>
+    <button id="kickButton">先頭の副大統領候補者をキック</button>
     <button id="maintenanceButton" class="gray">メンテナンスモードにする</button>
     
     <!-- 画像タップ機能（contentが4の時のみ表示） -->
