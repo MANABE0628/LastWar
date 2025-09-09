@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>今週の列車担当</title>
+  <style>
+    body { font-family: sans-serif; padding: 1em; }
+    table { border-collapse: collapse; margin-top: 1em; }
+    th, td { border: 1px solid #999; padding: 0.5em 1em; }
+    select { padding: 0.2em; }
+    button { margin-top: 1em; padding: 0.5em 1.2em; }
+  </style>
+</head>
+<body>
+  <h2>今週の列車担当</h2>
+  <form id="rankForm">
+    <table>
+      <tr><th>曜日</th><th>ランク条件</th></tr>
+      <tr><td>月曜</td>
+          <td>
+            <select name="mon">
+              <option value="none">なし</option>
+              <option value="r54" selected>R5,4</option>
+              <option value="r3">R3</option>
+              <option value="both">R5,4+R3</option>
+            </select>
+          </td>
+      </tr>
+      <tr><td>火曜</td>
+          <td>
+            <select name="tue">
+              <option value="none">なし</option>
+              <option value="r54">R5,4</option>
+              <option value="r3" selected>R3</option>
+              <option value="both">R5,4+R3</option>
+            </select>
+          </td>
+      </tr>
+      <tr><td>水曜</td>
+          <td>
+            <select name="wed">
+              <option value="none">なし</option>
+              <option value="r54">R5,4</option>
+              <option value="r3" selected>R3</option>
+              <option value="both">R5,4+R3</option>
+            </select>
+          </td>
+      </tr>
+      <tr><td>木曜</td>
+          <td>
+            <select name="thu">
+              <option value="none">なし</option>
+              <option value="r54">R5,4</option>
+              <option value="r3" selected>R3</option>
+              <option value="both">R5,4+R3</option>
+            </select>
+          </td>
+      </tr>
+      <tr><td>金曜</td>
+          <td>
+            <select name="fri">
+              <option value="none">なし</option>
+              <option value="r54">R5,4</option>
+              <option value="r3" selected>R3</option>
+              <option value="both">R5,4+R3</option>
+            </select>
+          </td>
+      </tr>
+      <tr><td>土曜</td>
+          <td>
+            <select name="sat">
+              <option value="none">なし</option>
+              <option value="r54">R5,4</option>
+              <option value="r3" selected>R3</option>
+              <option value="both">R5,4+R3</option>
+            </select>
+          </td>
+      </tr>
+      <tr><td>日曜</td>
+          <td>
+            <select name="sun">
+              <option value="none" selected>なし</option>
+              <option value="r54">R5,4</option>
+              <option value="r3">R3</option>
+              <option value="both">R5,4+R3</option>
+            </select>
+          </td>
+      </tr>
+    </table>
+    <button type="button" onclick="submitForm()">担当を決定</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxlPkKaJx3Hi3CVsNnHBgXAon75l7Jr4ye_vMPszDbMhk7C5q5rYYqZKe62_H28_8eXmA/exec";
+    const API_TOKEN = "absdo24365";
+
+    async function submitForm() {
+      const form = document.getElementById("rankForm");
+      const params = new URLSearchParams(new FormData(form));
+      params.append("action", "getWeekAssignments");
+      params.append("token", API_TOKEN);
+
+      const url = GAS_ENDPOINT + "?" + params.toString();
+      try {
+        const resp = await fetch(url);
+        const data = await resp.json();
+        if (!data.ok) {
+          document.getElementById("result").innerHTML = "<p>エラー: " + data.error + "</p>";
+          return;
+        }
+        renderResult(data.week);
+      } catch (err) {
+        document.getElementById("result").innerHTML = "<p>通信エラー: " + err + "</p>";
+      }
+    }
+
+    function renderResult(week) {
+      let html = "<h3>割当結果</h3><table><tr><th>曜日</th><th>日付</th><th>担当</th></tr>";
+      week.forEach(row => {
+        html += `<tr><td>${row.weekday}</td><td>${row.date}</td><td>${row.assignee || "-"}</td></tr>`;
+      });
+      html += "</table>";
+      document.getElementById("result").innerHTML = html;
+    }
+  </script>
+</body>
+</html>
