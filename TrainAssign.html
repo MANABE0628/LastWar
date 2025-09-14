@@ -6,7 +6,7 @@
   <style>
     body { font-family: sans-serif; padding: 1em; }
     table { border-collapse: collapse; margin-top: 1em; }
-    th, td { border: 1px solid #999; padding: 0.5em 1em; }
+    th, td { border: 1px solid #999; padding: 0.5em 1em; vertical-align: middle; }
     select { padding: 0.2em; }
     button { margin-top: 1em; padding: 0.5em 1.2em; }
   </style>
@@ -15,76 +15,97 @@
   <h2>今週の列車担当</h2>
   <form id="rankForm">
     <table>
-      <tr><th>曜日</th><th>ランク条件</th></tr>
-      <tr><td>月曜</td>
-          <td>
-            <select name="mon">
-              <option value="none">なし</option>
-              <option value="r54" selected>R5,4</option>
-              <option value="r3">R3</option>
-              <option value="both">R5,4+R3</option>
-            </select>
-          </td>
+      <tr><th>曜日</th><th>ランク条件</th><th>個人指定</th></tr>
+      <tr>
+        <td>月曜</td>
+        <td>
+          <select name="mon" onchange="togglePersonSelect(this)">
+            <option value="none">なし</option>
+            <option value="r54" selected>R5,4</option>
+            <option value="r3">R3</option>
+            <option value="both">R5,4+R3</option>
+            <option value="person">個人指定</option>
+          </select>
+        </td>
+        <td><select name="mon_person" class="personSelect" style="display:none"></select></td>
       </tr>
-      <tr><td>火曜</td>
-          <td>
-            <select name="tue">
-              <option value="none">なし</option>
-              <option value="r54">R5,4</option>
-              <option value="r3" selected>R3</option>
-              <option value="both">R5,4+R3</option>
-            </select>
-          </td>
+      <tr>
+        <td>火曜</td>
+        <td>
+          <select name="tue" onchange="togglePersonSelect(this)">
+            <option value="none">なし</option>
+            <option value="r54">R5,4</option>
+            <option value="r3" selected>R3</option>
+            <option value="both">R5,4+R3</option>
+            <option value="person">個人指定</option>
+          </select>
+        </td>
+        <td><select name="tue_person" class="personSelect" style="display:none"></select></td>
       </tr>
-      <tr><td>水曜</td>
-          <td>
-            <select name="wed">
-              <option value="none">なし</option>
-              <option value="r54">R5,4</option>
-              <option value="r3" selected>R3</option>
-              <option value="both">R5,4+R3</option>
-            </select>
-          </td>
+      <tr>
+        <td>水曜</td>
+        <td>
+          <select name="wed" onchange="togglePersonSelect(this)">
+            <option value="none">なし</option>
+            <option value="r54">R5,4</option>
+            <option value="r3" selected>R3</option>
+            <option value="both">R5,4+R3</option>
+            <option value="person">個人指定</option>
+          </select>
+        </td>
+        <td><select name="wed_person" class="personSelect" style="display:none"></select></td>
       </tr>
-      <tr><td>木曜</td>
-          <td>
-            <select name="thu">
-              <option value="none">なし</option>
-              <option value="r54">R5,4</option>
-              <option value="r3" selected>R3</option>
-              <option value="both">R5,4+R3</option>
-            </select>
-          </td>
+      <tr>
+        <td>木曜</td>
+        <td>
+          <select name="thu" onchange="togglePersonSelect(this)">
+            <option value="none">なし</option>
+            <option value="r54">R5,4</option>
+            <option value="r3" selected>R3</option>
+            <option value="both">R5,4+R3</option>
+            <option value="person">個人指定</option>
+          </select>
+        </td>
+        <td><select name="thu_person" class="personSelect" style="display:none"></select></td>
       </tr>
-      <tr><td>金曜</td>
-          <td>
-            <select name="fri">
-              <option value="none">なし</option>
-              <option value="r54">R5,4</option>
-              <option value="r3" selected>R3</option>
-              <option value="both">R5,4+R3</option>
-            </select>
-          </td>
+      <tr>
+        <td>金曜</td>
+        <td>
+          <select name="fri" onchange="togglePersonSelect(this)">
+            <option value="none">なし</option>
+            <option value="r54">R5,4</option>
+            <option value="r3" selected>R3</option>
+            <option value="both">R5,4+R3</option>
+            <option value="person">個人指定</option>
+          </select>
+        </td>
+        <td><select name="fri_person" class="personSelect" style="display:none"></select></td>
       </tr>
-      <tr><td>土曜</td>
-          <td>
-            <select name="sat">
-              <option value="none">なし</option>
-              <option value="r54">R5,4</option>
-              <option value="r3" selected>R3</option>
-              <option value="both">R5,4+R3</option>
-            </select>
-          </td>
+      <tr>
+        <td>土曜</td>
+        <td>
+          <select name="sat" onchange="togglePersonSelect(this)">
+            <option value="none">なし</option>
+            <option value="r54">R5,4</option>
+            <option value="r3" selected>R3</option>
+            <option value="both">R5,4+R3</option>
+            <option value="person">個人指定</option>
+          </select>
+        </td>
+        <td><select name="sat_person" class="personSelect" style="display:none"></select></td>
       </tr>
-      <tr><td>日曜</td>
-          <td>
-            <select name="sun">
-              <option value="none" selected>なし</option>
-              <option value="r54">R5,4</option>
-              <option value="r3">R3</option>
-              <option value="both">R5,4+R3</option>
-            </select>
-          </td>
+      <tr>
+        <td>日曜</td>
+        <td>
+          <select name="sun" onchange="togglePersonSelect(this)">
+            <option value="none" selected>なし</option>
+            <option value="r54">R5,4</option>
+            <option value="r3">R3</option>
+            <option value="both">R5,4+R3</option>
+            <option value="person">個人指定</option>
+          </select>
+        </td>
+        <td><select name="sun_person" class="personSelect" style="display:none"></select></td>
       </tr>
     </table>
     <button type="button" onclick="submitForm()">担当を決定</button>
@@ -96,11 +117,51 @@
     const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxlPkKaJx3Hi3CVsNnHBgXAon75l7Jr4ye_vMPszDbMhk7C5q5rYYqZKe62_H28_8eXmA/exec";
     const API_TOKEN = "absdo24365";
 
+    let memberList = [];
+
+    // ページロード時にメンバー一覧を取得してドロップダウンに設定
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const url = GAS_ENDPOINT + "?action=getMembers&token=" + API_TOKEN;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        if (data.ok && data.members) {
+          memberList = data.members;
+          document.querySelectorAll(".personSelect").forEach(sel => {
+            sel.innerHTML = '<option value="">選択してください</option>';
+            memberList.forEach(name => {
+              sel.innerHTML += `<option value="${name}">${name}</option>`;
+            });
+          });
+        }
+      } catch (e) {
+        console.error("メンバー取得失敗", e);
+      }
+    });
+
+    // 「個人指定」を選んだときだけ右のセレクトを表示
+    function togglePersonSelect(selectEl) {
+      const personSelect = selectEl.parentElement.nextElementSibling.querySelector("select");
+      if (selectEl.value === "person") {
+        personSelect.style.display = "inline";
+      } else {
+        personSelect.style.display = "none";
+        personSelect.value = "";
+      }
+    }
+
     async function submitForm() {
       const form = document.getElementById("rankForm");
       const params = new URLSearchParams(new FormData(form));
       params.append("action", "getWeekAssignments");
       params.append("token", API_TOKEN);
+
+      // 個人指定のときは person_xx パラメータを渡す
+      document.querySelectorAll(".personSelect").forEach(sel => {
+        if (sel.style.display !== "none" && sel.value) {
+          params.append(sel.name, sel.value);
+        }
+      });
 
       const url = GAS_ENDPOINT + "?" + params.toString();
       try {
