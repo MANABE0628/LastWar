@@ -2,144 +2,162 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>今週の列車担当</title>
+  <title>今週の列車担当（プレビュー→確定）</title>
   <style>
-    body { font-family: sans-serif; padding: 1em; }
-    table { border-collapse: collapse; margin-top: 1em; }
-    th, td { border: 1px solid #999; padding: 0.5em 1em; vertical-align: middle; }
-    select { padding: 0.2em; }
-    button { margin-top: 1em; padding: 0.5em 1.2em; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif; padding: 20px; }
+    table { border-collapse: collapse; margin-top: 12px; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px 10px; text-align: left; }
+    th { background: #f7f7f7; }
+    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    button { padding: 8px 14px; border: 0; border-radius: 8px; background: #111; color: #fff; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    select { padding: 6px 8px; border-radius: 6px; }
+    .muted { color: #666; font-size: 0.9em; }
+    .actions { display: flex; gap: 8px; margin-top: 12px; }
   </style>
 </head>
 <body>
-  <h2>今週の列車担当</h2>
+  <h2>今週の列車担当（プレビュー→確定）</h2>
+
   <form id="rankForm">
     <table>
-      <tr><th>曜日</th><th>ランク条件</th><th>個人指定</th></tr>
-      <tr>
-        <td>月曜</td>
-        <td>
-          <select name="mon" onchange="togglePersonSelect(this)">
-            <option value="none">なし</option>
-            <option value="r54" selected>R5,4</option>
-            <option value="r3">R3</option>
-            <option value="both">R5,4+R3</option>
-            <option value="person">個人指定</option>
-          </select>
-        </td>
-        <td><select name="mon_person" class="personSelect" style="display:none"></select></td>
-      </tr>
-      <tr>
-        <td>火曜</td>
-        <td>
-          <select name="tue" onchange="togglePersonSelect(this)">
-            <option value="none">なし</option>
-            <option value="r54">R5,4</option>
-            <option value="r3" selected>R3</option>
-            <option value="both">R5,4+R3</option>
-            <option value="person">個人指定</option>
-          </select>
-        </td>
-        <td><select name="tue_person" class="personSelect" style="display:none"></select></td>
-      </tr>
-      <tr>
-        <td>水曜</td>
-        <td>
-          <select name="wed" onchange="togglePersonSelect(this)">
-            <option value="none">なし</option>
-            <option value="r54">R5,4</option>
-            <option value="r3" selected>R3</option>
-            <option value="both">R5,4+R3</option>
-            <option value="person">個人指定</option>
-          </select>
-        </td>
-        <td><select name="wed_person" class="personSelect" style="display:none"></select></td>
-      </tr>
-      <tr>
-        <td>木曜</td>
-        <td>
-          <select name="thu" onchange="togglePersonSelect(this)">
-            <option value="none">なし</option>
-            <option value="r54">R5,4</option>
-            <option value="r3" selected>R3</option>
-            <option value="both">R5,4+R3</option>
-            <option value="person">個人指定</option>
-          </select>
-        </td>
-        <td><select name="thu_person" class="personSelect" style="display:none"></select></td>
-      </tr>
-      <tr>
-        <td>金曜</td>
-        <td>
-          <select name="fri" onchange="togglePersonSelect(this)">
-            <option value="none">なし</option>
-            <option value="r54">R5,4</option>
-            <option value="r3" selected>R3</option>
-            <option value="both">R5,4+R3</option>
-            <option value="person">個人指定</option>
-          </select>
-        </td>
-        <td><select name="fri_person" class="personSelect" style="display:none"></select></td>
-      </tr>
-      <tr>
-        <td>土曜</td>
-        <td>
-          <select name="sat" onchange="togglePersonSelect(this)">
-            <option value="none">なし</option>
-            <option value="r54">R5,4</option>
-            <option value="r3" selected>R3</option>
-            <option value="both">R5,4+R3</option>
-            <option value="person">個人指定</option>
-          </select>
-        </td>
-        <td><select name="sat_person" class="personSelect" style="display:none"></select></td>
-      </tr>
-      <tr>
-        <td>日曜</td>
-        <td>
-          <select name="sun" onchange="togglePersonSelect(this)">
-            <option value="none" selected>なし</option>
-            <option value="r54">R5,4</option>
-            <option value="r3">R3</option>
-            <option value="both">R5,4+R3</option>
-            <option value="person">個人指定</option>
-          </select>
-        </td>
-        <td><select name="sun_person" class="personSelect" style="display:none"></select></td>
-      </tr>
+      <thead><tr><th>曜日</th><th>ランク条件</th><th>個人指定</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>月曜</td>
+          <td>
+            <select name="mon" onchange="togglePersonSelect(this)">
+              <option value="none">なし</option>
+              <option value="r54" selected>R5,4</option>
+              <option value="r3">R3</option>
+              <option value="both">R5,4+R3</option>
+              <option value="person">個人指定</option>
+            </select>
+          </td>
+          <td><select name="mon_person" class="personSelect" style="display:none"></select></td>
+        </tr>
+        <tr>
+          <td>火曜</td>
+          <td>
+            <select name="tue" onchange="togglePersonSelect(this)">
+              <option value="none">なし</option>
+              <option value="r54">R5,4</option>
+              <option value="r3" selected>R3</option>
+              <option value="both">R5,4+R3</option>
+              <option value="person">個人指定</option>
+            </select>
+          </td>
+          <td><select name="tue_person" class="personSelect" style="display:none"></select></td>
+        </tr>
+        <tr>
+          <td>水曜</td>
+          <td>
+            <select name="wed" onchange="togglePersonSelect(this)">
+              <option value="none">なし</option>
+              <option value="r54">R5,4</option>
+              <option value="r3" selected>R3</option>
+              <option value="both">R5,4+R3</option>
+              <option value="person">個人指定</option>
+            </select>
+          </td>
+          <td><select name="wed_person" class="personSelect" style="display:none"></select></td>
+        </tr>
+        <tr>
+          <td>木曜</td>
+          <td>
+            <select name="thu" onchange="togglePersonSelect(this)">
+              <option value="none">なし</option>
+              <option value="r54">R5,4</option>
+              <option value="r3" selected>R3</option>
+              <option value="both">R5,4+R3</option>
+              <option value="person">個人指定</option>
+            </select>
+          </td>
+          <td><select name="thu_person" class="personSelect" style="display:none"></select></td>
+        </tr>
+        <tr>
+          <td>金曜</td>
+          <td>
+            <select name="fri" onchange="togglePersonSelect(this)">
+              <option value="none">なし</option>
+              <option value="r54">R5,4</option>
+              <option value="r3" selected>R3</option>
+              <option value="both">R5,4+R3</option>
+              <option value="person">個人指定</option>
+            </select>
+          </td>
+          <td><select name="fri_person" class="personSelect" style="display:none"></select></td>
+        </tr>
+        <tr>
+          <td>土曜</td>
+          <td>
+            <select name="sat" onchange="togglePersonSelect(this)">
+              <option value="none">なし</option>
+              <option value="r54">R5,4</option>
+              <option value="r3" selected>R3</option>
+              <option value="both">R5,4+R3</option>
+              <option value="person">個人指定</option>
+            </select>
+          </td>
+          <td><select name="sat_person" class="personSelect" style="display:none"></select></td>
+        </tr>
+        <tr>
+          <td>日曜</td>
+          <td>
+            <select name="sun" onchange="togglePersonSelect(this)">
+              <option value="none" selected>なし</option>
+              <option value="r54">R5,4</option>
+              <option value="r3">R3</option>
+              <option value="both">R5,4+R3</option>
+              <option value="person">個人指定</option>
+            </select>
+          </td>
+          <td><select name="sun_person" class="personSelect" style="display:none"></select></td>
+        </tr>
+      </tbody>
     </table>
-    <button type="button" onclick="submitForm()">担当を決定</button>
+
+    <div class="actions">
+      <button type="button" id="btnPreview">プレビュー</button>
+      <button type="button" id="btnRedo" disabled>再抽選</button>
+      <button type="button" id="btnConfirm" disabled>確定</button>
+      <span id="status" class="muted">各曜日の条件を選んでプレビュー</span>
+    </div>
   </form>
 
-  <div id="result"></div>
+  <table id="result" style="display:none">
+    <thead><tr><th>曜日</th><th>日付</th><th>担当</th></tr></thead>
+    <tbody id="tbody-result"></tbody>
+  </table>
 
   <script>
-    const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxlPkKaJx3Hi3CVsNnHBgXAon75l7Jr4ye_vMPszDbMhk7C5q5rYYqZKe62_H28_8eXmA/exec";
-    const API_TOKEN = "absdo24365";
+    const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwAuBBWw3EmgkMvY1lPTv70XIV07UWIKqV-y8VX80vZEk5P1LoQi0M6wvJzJRDW_yPp/exec";
+    const API_TOKEN    = "absdo24365";
 
     let memberList = [];
+    let lastPreview = null; // { week: [...], ranksToReset: [...] }
 
-    // ページロード時にメンバー一覧を取得してドロップダウンに設定
     window.addEventListener("DOMContentLoaded", async () => {
+      // メンバー一覧取得（個人指定用）
       try {
-        const url = GAS_ENDPOINT + "?action=getMembers&token=" + API_TOKEN;
+        const url = `${GAS_ENDPOINT}?action=getMembers&token=${API_TOKEN}`;
         const resp = await fetch(url);
         const data = await resp.json();
         if (data.ok && data.members) {
           memberList = data.members;
           document.querySelectorAll(".personSelect").forEach(sel => {
             sel.innerHTML = '<option value="">選択してください</option>';
-            memberList.forEach(name => {
-              sel.innerHTML += `<option value="${name}">${name}</option>`;
-            });
+            memberList.forEach(name => sel.innerHTML += `<option value="${name}">${name}</option>`);
           });
         }
-      } catch (e) {
-        console.error("メンバー取得失敗", e);
-      }
+      } catch (e) { console.error("メンバー取得失敗", e); }
+
+      // ボタンイベント
+      document.getElementById("btnPreview").addEventListener("click", preview);
+      document.getElementById("btnRedo").addEventListener("click", preview);
+      document.getElementById("btnConfirm").addEventListener("click", confirmAssign);
     });
 
-    // 「個人指定」を選んだときだけ右のセレクトを表示
     function togglePersonSelect(selectEl) {
       const personSelect = selectEl.parentElement.nextElementSibling.querySelector("select");
       if (selectEl.value === "person") {
@@ -150,40 +168,77 @@
       }
     }
 
-    async function submitForm() {
+    async function preview() {
+      setBusy(true, "抽選中...");
       const form = document.getElementById("rankForm");
       const params = new URLSearchParams(new FormData(form));
-      params.append("action", "getWeekAssignments");
+      params.append("action", "previewWeekAssignments");
       params.append("token", API_TOKEN);
 
-      // 個人指定のときは person_xx パラメータを渡す
+      // person 選択時のみ *_person を含める（空は送らない）
       document.querySelectorAll(".personSelect").forEach(sel => {
+        const rankSel = sel.closest("tr").querySelector("select[name$='']") || null;
         if (sel.style.display !== "none" && sel.value) {
           params.append(sel.name, sel.value);
         }
       });
 
-      const url = GAS_ENDPOINT + "?" + params.toString();
       try {
-        const resp = await fetch(url);
+        const url = `${GAS_ENDPOINT}?${params.toString()}`;
+        const resp = await fetch(url, { method: "GET", cache: "no-store" });
         const data = await resp.json();
-        if (!data.ok) {
-          document.getElementById("result").innerHTML = "<p>エラー: " + data.error + "</p>";
-          return;
-        }
-        renderResult(data.week);
+        if (!data.ok) throw new Error(data.error || "unknown error");
+        lastPreview = { week: data.week || [], ranksToReset: data.ranksToReset || [] };
+        renderResult(lastPreview.week);
+        setBusy(false, "プレビュー完了。内容を確認して「確定」へ。");
+        document.getElementById("btnConfirm").disabled = false;
+        document.getElementById("btnRedo").disabled = false;
       } catch (err) {
-        document.getElementById("result").innerHTML = "<p>通信エラー: " + err + "</p>";
+        console.error(err);
+        setBusy(false, "エラー: " + err.message);
+      }
+    }
+
+    async function confirmAssign() {
+      if (!lastPreview) {
+        setBusy(false, "先にプレビューしてください");
+        return;
+      }
+      setBusy(true, "確定中...");
+      try {
+        const url = `${GAS_ENDPOINT}?action=confirmWeekAssignments&token=${API_TOKEN}`;
+        const body = JSON.stringify(lastPreview); // {week, ranksToReset}
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body
+        });
+        const data = await resp.json();
+        if (!data.ok) throw new Error(data.error || "unknown error");
+        setBusy(false, "確定しました！（スプレッドに反映済み）");
+        // 確定後は再度プレビュー/確定できるように維持
+      } catch (err) {
+        console.error(err);
+        setBusy(false, "エラー: " + err.message);
       }
     }
 
     function renderResult(week) {
-      let html = "<h3>割当結果</h3><table><tr><th>曜日</th><th>日付</th><th>担当</th></tr>";
+      const tbody = document.getElementById("tbody-result");
+      tbody.innerHTML = "";
       week.forEach(row => {
-        html += `<tr><td>${row.weekday}</td><td>${row.date}</td><td>${row.assignee || "-"}</td></tr>`;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${row.weekday}</td><td>${row.date}</td><td>${row.assignee || "-"}</td>`;
+        tbody.appendChild(tr);
       });
-      html += "</table>";
-      document.getElementById("result").innerHTML = html;
+      document.getElementById("result").style.display = "";
+    }
+
+    function setBusy(isBusy, msg) {
+      document.getElementById("btnPreview").disabled = isBusy;
+      document.getElementById("btnRedo").disabled = isBusy;
+      document.getElementById("btnConfirm").disabled = isBusy || !lastPreview;
+      document.getElementById("status").textContent = msg;
     }
   </script>
 </body>
