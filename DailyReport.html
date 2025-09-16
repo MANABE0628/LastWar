@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sheet Text View</title>
+  <style>
+    :root { --fg:#222; --muted:#666; --bd:#e5e7eb; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif; color:var(--fg); margin:24px; }
+    h1 { margin: 0 0 12px; font-size: 18px; }
+    .note { margin: 8px 0 12px; font-size: 13px; color: var(--muted); }
+    .box { border:1px solid var(--bd); border-radius:12px; padding:12px; background:#fff; }
+    pre { white-space: pre-wrap; word-break: break-word; margin:0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    button { padding:8px 14px; font-size:14px; border:1px solid var(--bd); border-radius:10px; background:#f8f9fb; cursor:pointer; }
+    button:active { transform: translateY(1px); }
+    .muted { color:var(--muted); font-size:12px; }
+    textarea { width:100%; height:220px; margin-top:8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .pill { display:inline-block; padding:2px 8px; border:1px solid var(--bd); border-radius:999px; margin-left:8px; font-size:12px; }
+  </style>
+</head>
+<body>
+  <h1>A4〜A37 表示（A6〜A11は空なら詰め）<span id="stat" class="pill"></span></h1>
+
+  <!-- 表示部（人が読む用） -->
+  <div class="box">
+    <pre id="view">(読込中…)</pre>
+  </div>
+
+  <!-- 注釈文 -->
+  <div class="note">［議事堂戦・戦域戦や隕鉄などの突発イベントは手入力ください］</div>
+
+  <!-- コピーボタン -->
+  <div class="row" style="margin: 8px 0 4px;">
+    <button id="copyBtn">この内容をコピー</button>
+    <span id="msg" class="muted"></span>
+  </div>
+
+  <!-- 下部に“スプレッドの文字”＝同じ内容を編集可なテキストエリアで表示 -->
+  <textarea id="raw"></textarea>
+  <div class="muted">上の表示と同一内容です。必要ならここで編集してからコピーしてもOK。</div>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    const view = $('#view');
+    const raw  = $('#raw');
+    const msg  = $('#msg');
+    const stat = $('#stat');
+
+    function load() {
+      msg.textContent = '読込中…';
+      google.script.run
+        .withSuccessHandler(res => {
+          view.textContent = res.text || '';
+          raw.value = res.text || '';
+          stat.textContent = `${res.sheet} ${res.a1} ｜ ${res.lineCount}行`;
+          msg.textContent = '読み込み完了';
+        })
+        .withFailureHandler(err => {
+          view.textContent = 'エラーで読み込めませんでした。';
+          raw.value = '';
+          stat.textContent = '';
+          msg.textContent = 'エラー: ' + (err?.message || err);
+        })
+        .fetchTextForView();
+    }
+
+    $('#copyBtn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(raw.value);
+        msg.textContent = 'コピーしました';
+      } catch (e) {
+        raw.focus(); raw.select();
+        const ok = document.execCommand('copy');
+        msg.textContent = ok ? 'コピーしました（fallback）' : 'コピー失敗…';
+      }
+    });
+
+    window.addEventListener('load', load);
+  </script>
+</body>
+</html>
