@@ -1,82 +1,71 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sheet Text View</title>
-  <style>
-    :root { --fg:#222; --muted:#666; --bd:#e5e7eb; }
-    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif; color:var(--fg); margin:24px; }
-    h1 { margin: 0 0 12px; font-size: 18px; }
-    .note { margin: 8px 0 12px; font-size: 13px; color: var(--muted); }
-    .box { border:1px solid var(--bd); border-radius:12px; padding:12px; background:#fff; }
-    pre { white-space: pre-wrap; word-break: break-word; margin:0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-    button { padding:8px 14px; font-size:14px; border:1px solid var(--bd); border-radius:10px; background:#f8f9fb; cursor:pointer; }
-    button:active { transform: translateY(1px); }
-    .muted { color:var(--muted); font-size:12px; }
-    textarea { width:100%; height:220px; margin-top:8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    .pill { display:inline-block; padding:2px 8px; border:1px solid var(--bd); border-radius:999px; margin-left:8px; font-size:12px; }
-  </style>
-</head>
-<body>
-  <h1>A4〜A37 表示（A6〜A11は空なら詰め）<span id="stat" class="pill"></span></h1>
+<!doctype html>
+<meta charset="utf-8">
+<title>kbcy Daily Announcement</title>
+<style>
+  body{font:14px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans JP",sans-serif; margin:24px}
+  h1{font-size:20px; margin:0 0 12px}
+  .muted{color:#666; font-size:12px}
+  button{padding:8px 14px; border:1px solid #e5e7eb; border-radius:10px; background:#f8f9fb; cursor:pointer}
+  textarea{width:100%; height:260px; margin-top:8px; font-family:ui-monospace,Consolas,Menlo,monospace}
+</style>
 
-  <!-- 表示部（人が読む用） -->
-  <div class="box">
-    <pre id="view">(読込中…)</pre>
-  </div>
+<!-- タイトル -->
+<h1>kbcy Daily Announcement</h1>
 
-  <!-- 注釈文 -->
-  <div class="note">［議事堂戦・戦域戦や隕鉄などの突発イベントは手入力ください］</div>
+<!-- 注釈文 -->
+<div class="muted">［議事堂戦・戦域戦や隕鉄などの突発イベントは手入力ください］</div>
 
-  <!-- コピーボタン -->
-  <div class="row" style="margin: 8px 0 4px;">
-    <button id="copyBtn">この内容をコピー</button>
-    <span id="msg" class="muted"></span>
-  </div>
+<!-- コピーボタン -->
+<p><button id="copyBtn">この内容をコピー</button> <span id="msg" class="muted"></span></p>
 
-  <!-- 下部に“スプレッドの文字”＝同じ内容を編集可なテキストエリアで表示 -->
-  <textarea id="raw"></textarea>
-  <div class="muted">上の表示と同一内容です。必要ならここで編集してからコピーしてもOK。</div>
+<!-- テキストエリア -->
+<textarea id="raw" placeholder="読込中…"></textarea>
+<div class="muted">必要ならここで編集してからコピーしてもOK。</div>
 
-  <script>
-    const $ = s => document.querySelector(s);
-    const view = $('#view');
-    const raw  = $('#raw');
-    const msg  = $('#msg');
-    const stat = $('#stat');
+<script>
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwf-CnItLOCeiucXiq6IF2ohA3wGEZjEuj1WL6mSwSORunJNdydtCK17reJw81wJISQwg/exec?api=fetch';
 
-    function load() {
+  const raw = document.getElementById('raw');
+  const msg = document.getElementById('msg');
+
+  function applyData(payload){
+    const ok = payload?.ok ?? true;
+    const data = ok ? (payload.data ?? payload) : null;
+    if (!ok) throw new Error(payload.error || 'Unknown GAS error');
+
+    raw.value = data.text || '';
+    msg.textContent = '読み込み完了';
+  }
+
+  function showError(e){
+    const m = (e && (e.message || e)) || 'Unknown error';
+    raw.value = '';
+    msg.textContent = 'エラー: ' + m;
+    console.error('[load error]', e);
+  }
+
+  async function load(){
+    try{
       msg.textContent = '読込中…';
-      google.script.run
-        .withSuccessHandler(res => {
-          view.textContent = res.text || '';
-          raw.value = res.text || '';
-          stat.textContent = `${res.sheet} ${res.a1} ｜ ${res.lineCount}行`;
-          msg.textContent = '読み込み完了';
-        })
-        .withFailureHandler(err => {
-          view.textContent = 'エラーで読み込めませんでした。';
-          raw.value = '';
-          stat.textContent = '';
-          msg.textContent = 'エラー: ' + (err?.message || err);
-        })
-        .fetchTextForView();
+      const r = await fetch(ENDPOINT);
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      const json = await r.json();
+      applyData(json);
+      return;
+    }catch(e){
+      const cb = 'cb_' + Math.random().toString(36).slice(2);
+      window[cb] = (json)=>{ try{ applyData(json); }catch(e){ showError(e); } finally{ delete window[cb]; } };
+      const s = document.createElement('script');
+      s.src = ENDPOINT + '&alt=jsonp&callback=' + cb;
+      s.onerror = ()=> showError('JSONP load error');
+      document.body.appendChild(s);
     }
+  }
 
-    $('#copyBtn').addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(raw.value);
-        msg.textContent = 'コピーしました';
-      } catch (e) {
-        raw.focus(); raw.select();
-        const ok = document.execCommand('copy');
-        msg.textContent = ok ? 'コピーしました（fallback）' : 'コピー失敗…';
-      }
-    });
+  document.getElementById('copyBtn').addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(raw.value); msg.textContent = 'コピーしました'; }
+    catch{ raw.focus(); raw.select(); msg.textContent = document.execCommand('copy') ? 'コピーしました（fallback）' : 'コピー失敗…'; }
+  });
 
-    window.addEventListener('load', load);
-  </script>
-</body>
-</html>
+  window.addEventListener('load', load);
+</script>
