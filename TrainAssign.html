@@ -206,32 +206,37 @@
     }
 
     async function confirmAssign() {
-  if (!lastPreview) { setBusy(false, "先にプレビューしてください"); return; }
-  setBusy(true, "確定中...");
+      if (!lastPreview) { setBusy(false, "先にプレビューしてください"); return; }
+      setBusy(true, "確定中...");
 
-  try {
-    const resp = await fetch(GAS_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },   // ← 修正
-      body: JSON.stringify({
-        action: "confirmWeekAssignments",
-        token: API_TOKEN,
-        week: lastPreview.week
-      })
-    });
+      try {
+        const url  = `${GAS_ENDPOINT}?token=${API_TOKEN}`;
+        const body = JSON.stringify({
+          action: "confirmWeekAssignments",
+          week: lastPreview.week,
+          ranksToReset: lastPreview.ranksToReset
+        });
 
-    const data = await resp.json();   // ← JSON 前提
-    if (!data.ok) throw new Error(data.error || "unknown error");
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body
+        });
 
-    setBusy(false, "確定しました！（スプレッドに反映済み）");
-    document.getElementById("btnPreview").disabled = true;
-    document.getElementById("btnConfirm").disabled = true;
-    document.getElementById("status").textContent = "確定済み。再抽選はできません。";
-  } catch (err) {
-    console.error(err);
-    setBusy(false, "エラー: " + err.message);
-  }
-}
+        const data = await resp.json();
+        if (!data.ok) throw new Error(data.error || "unknown error");
+
+        setBusy(false, "確定しました！（スプレッドに反映済み）");
+
+        document.getElementById("btnPreview").disabled = true;
+        document.getElementById("btnConfirm").disabled = true;
+        document.getElementById("status").textContent = "確定済み。再抽選はできません。";
+      } catch (err) {
+        console.error(err);
+        setBusy(false, "エラー: " + err.message);
+      }
+    }
+
     function renderResult(week) {
       const tbody = document.getElementById("tbody-result");
       tbody.innerHTML = "";
