@@ -2,27 +2,27 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>今週の列車担当（プレビュー→確定）</title>
+  <title>今週の列車担当</title>
   <style>
     body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif; padding: 20px; }
     table { border-collapse: collapse; margin-top: 12px; width: 100%; }
     th, td { border: 1px solid #ccc; padding: 8px 10px; text-align: left; }
     th { background: #f7f7f7; }
-    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     button { padding: 8px 14px; border: 0; border-radius: 8px; background: #111; color: #fff; cursor: pointer; }
     button:disabled { opacity: .5; cursor: not-allowed; }
     select { padding: 6px 8px; border-radius: 6px; }
-    .muted { color: #666; font-size: 0.9em; }
-    .actions { display: flex; gap: 8px; margin-top: 12px; }
+    .muted { color: #666; font-size: 0.9em; margin-left: 8px; }
+    .actions { display: flex; gap: 8px; margin-top: 12px; align-items: center; flex-wrap: wrap; }
   </style>
 </head>
 <body>
-  <h2>今週の列車担当（プレビュー→確定）</h2>
+  <h2>今週の列車担当</h2>
 
   <form id="rankForm">
     <table>
       <thead><tr><th>曜日</th><th>ランク条件</th><th>個人指定</th></tr></thead>
       <tbody>
+        <!-- 月曜 -->
         <tr>
           <td>月曜</td>
           <td>
@@ -36,6 +36,8 @@
           </td>
           <td><select name="mon_person" class="personSelect" style="display:none"></select></td>
         </tr>
+
+        <!-- 火曜 -->
         <tr>
           <td>火曜</td>
           <td>
@@ -49,6 +51,8 @@
           </td>
           <td><select name="tue_person" class="personSelect" style="display:none"></select></td>
         </tr>
+
+        <!-- 水曜 -->
         <tr>
           <td>水曜</td>
           <td>
@@ -62,6 +66,8 @@
           </td>
           <td><select name="wed_person" class="personSelect" style="display:none"></select></td>
         </tr>
+
+        <!-- 木曜 -->
         <tr>
           <td>木曜</td>
           <td>
@@ -75,6 +81,8 @@
           </td>
           <td><select name="thu_person" class="personSelect" style="display:none"></select></td>
         </tr>
+
+        <!-- 金曜 -->
         <tr>
           <td>金曜</td>
           <td>
@@ -88,6 +96,8 @@
           </td>
           <td><select name="fri_person" class="personSelect" style="display:none"></select></td>
         </tr>
+
+        <!-- 土曜 -->
         <tr>
           <td>土曜</td>
           <td>
@@ -101,6 +111,8 @@
           </td>
           <td><select name="sat_person" class="personSelect" style="display:none"></select></td>
         </tr>
+
+        <!-- 日曜 -->
         <tr>
           <td>日曜</td>
           <td>
@@ -119,14 +131,13 @@
 
     <div class="actions">
       <button type="button" id="btnPreview">プレビュー</button>
-      <button type="button" id="btnRedo" disabled>再抽選</button>
       <button type="button" id="btnConfirm" disabled>確定</button>
-      <span id="status" class="muted">各曜日の条件を選んでプレビュー</span>
+      <span id="status" class="muted">条件を選んで「プレビュー」してください</span>
     </div>
   </form>
 
   <table id="result" style="display:none">
-    <thead><tr><th>曜日</th><th>日付</th><th>担当</th></tr></thead>
+    <thead><tr><th>曜日</th><th>日付（翌週）</th><th>担当</th></tr></thead>
     <tbody id="tbody-result"></tbody>
   </table>
 
@@ -135,13 +146,13 @@
     const API_TOKEN    = "absdo24365";
 
     let memberList = [];
-    let lastPreview = null; // { week: [...], ranksToReset: [...] }
+    let lastPreview = null;
 
     window.addEventListener("DOMContentLoaded", async () => {
-      // メンバー一覧取得（個人指定用）
+      // メンバー一覧（個人指定用）
       try {
         const url = `${GAS_ENDPOINT}?action=getMembers&token=${API_TOKEN}`;
-        const resp = await fetch(url);
+        const resp = await fetch(url, { cache: "no-store" });
         const data = await resp.json();
         if (data.ok && data.members) {
           memberList = data.members;
@@ -152,9 +163,7 @@
         }
       } catch (e) { console.error("メンバー取得失敗", e); }
 
-      // ボタンイベント
       document.getElementById("btnPreview").addEventListener("click", preview);
-      document.getElementById("btnRedo").addEventListener("click", preview);
       document.getElementById("btnConfirm").addEventListener("click", confirmAssign);
     });
 
@@ -175,12 +184,8 @@
       params.append("action", "previewWeekAssignments");
       params.append("token", API_TOKEN);
 
-      // person 選択時のみ *_person を含める（空は送らない）
       document.querySelectorAll(".personSelect").forEach(sel => {
-        const rankSel = sel.closest("tr").querySelector("select[name$='']") || null;
-        if (sel.style.display !== "none" && sel.value) {
-          params.append(sel.name, sel.value);
-        }
+        if (sel.style.display !== "none" && sel.value) params.append(sel.name, sel.value);
       });
 
       try {
@@ -188,11 +193,12 @@
         const resp = await fetch(url, { method: "GET", cache: "no-store" });
         const data = await resp.json();
         if (!data.ok) throw new Error(data.error || "unknown error");
+
         lastPreview = { week: data.week || [], ranksToReset: data.ranksToReset || [] };
         renderResult(lastPreview.week);
+
         setBusy(false, "プレビュー完了。内容を確認して「確定」へ。");
         document.getElementById("btnConfirm").disabled = false;
-        document.getElementById("btnRedo").disabled = false;
       } catch (err) {
         console.error(err);
         setBusy(false, "エラー: " + err.message);
@@ -200,23 +206,31 @@
     }
 
     async function confirmAssign() {
-      if (!lastPreview) {
-        setBusy(false, "先にプレビューしてください");
-        return;
-      }
+      if (!lastPreview) { setBusy(false, "先にプレビューしてください"); return; }
       setBusy(true, "確定中...");
+
       try {
-        const url = `${GAS_ENDPOINT}?action=confirmWeekAssignments&token=${API_TOKEN}`;
-        const body = JSON.stringify(lastPreview); // {week, ranksToReset}
+        const url  = `${GAS_ENDPOINT}?token=${API_TOKEN}`;
+        const body = JSON.stringify({
+          action: "confirmWeekAssignments",
+          week: lastPreview.week,
+          ranksToReset: lastPreview.ranksToReset
+        });
+
         const resp = await fetch(url, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
           body
         });
+
         const data = await resp.json();
         if (!data.ok) throw new Error(data.error || "unknown error");
+
         setBusy(false, "確定しました！（スプレッドに反映済み）");
-        // 確定後は再度プレビュー/確定できるように維持
+
+        document.getElementById("btnPreview").disabled = true;
+        document.getElementById("btnConfirm").disabled = true;
+        document.getElementById("status").textContent = "確定済み。再抽選はできません。";
       } catch (err) {
         console.error(err);
         setBusy(false, "エラー: " + err.message);
@@ -235,8 +249,7 @@
     }
 
     function setBusy(isBusy, msg) {
-      document.getElementById("btnPreview").disabled = isBusy;
-      document.getElementById("btnRedo").disabled = isBusy;
+      document.getElementById("btnPreview").disabled = isBusy || document.getElementById("btnPreview").disabled;
       document.getElementById("btnConfirm").disabled = isBusy || !lastPreview;
       document.getElementById("status").textContent = msg;
     }
