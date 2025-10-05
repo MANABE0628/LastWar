@@ -1,0 +1,176 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>kbcy Daily Announcement</title>
+<style>
+  body{font:14px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans JP",sans-serif; margin:24px}
+  h1{font-size:20px; margin:0 0 12px}
+  .muted{color:#666; font-size:12px}
+  button{padding:8px 14px; border:1px solid #e5e7eb; border-radius:10px; background:#f8f9fb; cursor:pointer}
+  textarea{width:100%; height:260px; margin-top:8px; font-family:ui-monospace,Consolas,Menlo,monospace}
+  .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+</style>
+
+<h1>Snry Daily Announcement</h1>
+
+<div class="muted">［ゾンビ侵攻・議事堂戦・隕鉄などの不定期イベントは手入力ください］</div>
+
+<p class="row">
+  <button id="copyBtn">この内容をコピー</button>
+  <span id="msg" class="muted"></span>
+  <span id="stamp" class="muted" style="margin-left:auto"></span>
+</p>
+
+<textarea id="raw" placeholder="読込中…"></textarea>
+<div class="muted">必要ならここで編集してからコピーしてもOK。</div>
+
+<script>
+  /** ===== 設定 ===== */
+  // A) Sheetsの「ウェブに公開」CSV（任意・あれば最優先で使用）
+  //   公開手順：シート側で A列の整形を式で作る → 対象シート/範囲を [ウェブに公開] でCSV公開
+  //   例の整形式：={ A4:A5; FILTER(A6:A11, A6:A11 <> ""); A12:A37 }
+  const CSV_URL = ''; // 例: 'https://docs.google.com/spreadsheets/d/xxxx/pub?gid=yyy&single=true&output=csv'
+
+  // B) GASの /exec ベースURL（あなたのURLに置換）
+  const GAS_EXEC_BASE = 'https://script.google.com/macros/s/AKfycbwlKL5f3i2tRnAQgW0CSO-rBE4YNswzXugBmpsj4FsiO3vdyU17jTdmkTVcR18G8CURQQ/exec';
+  // fetch用（キャッシュ120秒）：?ttl=120 / nocacheは必要時のみ指定
+  const GAS_FETCH_URL = `${GAS_EXEC_BASE}?api=fetch&ttl=120`;
+  const GAS_PING_URL  = `${GAS_EXEC_BASE}?api=ping`;
+
+  // C) ウォームアップ間隔（ms）
+  const PING_INTERVAL_MS = 5 * 60 * 1000; // 5分
+
+  // D) ローカルキャッシュキー
+  const LS_KEY = 'kbcy_daily_announcement_v1';
+
+  /** ===== 参照 ===== */
+  const raw = document.getElementById('raw');
+  const msg = document.getElementById('msg');
+  const stamp = document.getElementById('stamp');
+
+  /** ===== 便利関数 ===== */
+  function setMsg(t){ msg.textContent = t; }
+  function setStamp(ts, source){
+    if (!ts) { stamp.textContent = ''; return; }
+    const d = new Date(ts);
+    const pad = n => String(n).padStart(2,'0');
+    stamp.textContent = `更新: ${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}（${source}）`;
+  }
+  function saveLocal(text){
+    const payload = { text, ts: Date.now() };
+    try { localStorage.setItem(LS_KEY, JSON.stringify(payload)); } catch {}
+  }
+  function loadLocal(){
+    try {
+      const s = localStorage.getItem(LS_KEY);
+      if (!s) return null;
+      return JSON.parse(s);
+    } catch { return null; }
+  }
+
+  /** ===== データ取得（CSV優先→GAS→JSONP） ===== */
+  async function fetchCsvFirst(){
+    if (!CSV_URL) return null;
+    try {
+      const r = await fetch(CSV_URL, { cache: 'no-store' });
+      if (!r.ok) throw new Error('CSV HTTP ' + r.status);
+      const csv = await r.text();
+      // 1列想定：改行で分割→結合（空行はそのまま保持）
+      const lines = csv.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+      // 末尾に余計な空行がつくことがあるので軽く整える（必要なら）
+      while (lines.length && lines[lines.length-1] === '') lines.pop();
+      return { text: lines.join('\n'), source: 'CSV' };
+    } catch (e) {
+      console.warn('CSV fetch failed', e);
+      return null;
+    }
+  }
+
+  async function fetchGasJson(){
+    const r = await fetch(GAS_FETCH_URL, { cache: 'no-store' });
+    if (!r.ok) throw new Error('GAS HTTP ' + r.status);
+    const payload = await r.json();
+    const ok = payload?.ok ?? true;
+    if (!ok) throw new Error(payload?.error || 'GAS error');
+    const data = payload.data ?? payload;
+    return { text: data.text || '', ts: data.generatedAt || Date.now(), source: 'GAS(JSON)' };
+  }
+
+  function fetchGasJsonp(){
+    return new Promise((resolve, reject) => {
+      const cb = 'cb_' + Math.random().toString(36).slice(2);
+      window[cb] = (payload) => {
+        try {
+          const ok = payload?.ok ?? true;
+          if (!ok) throw new Error(payload?.error || 'GAS error(JSONP)');
+          const data = payload.data ?? payload;
+          resolve({ text: data.text || '', ts: data.generatedAt || Date.now(), source: 'GAS(JSONP)' });
+        } catch (e) { reject(e); }
+        finally { delete window[cb]; }
+      };
+      const s = document.createElement('script');
+      s.src = `${GAS_FETCH_URL}&alt=jsonp&callback=${cb}`;
+      s.onerror = () => reject(new Error('JSONP load error'));
+      document.body.appendChild(s);
+    });
+  }
+
+  async function loadFresh(){
+    setMsg('読込中…');
+
+    // 1) CSV優先
+    const csvRes = await fetchCsvFirst();
+    if (csvRes) {
+      raw.value = csvRes.text;
+      setMsg('読み込み完了');
+      setStamp(Date.now(), csvRes.source);
+      saveLocal(csvRes.text);
+      return;
+    }
+
+    // 2) GAS（JSON）→ 3) だめなら JSONP
+    try {
+      const res = await fetchGasJson();
+      raw.value = res.text;
+      setMsg('読み込み完了');
+      setStamp(res.ts, res.source);
+      saveLocal(res.text);
+    } catch (e1) {
+      console.warn('GAS fetch failed, fallback to JSONP', e1);
+      try {
+        const res2 = await fetchGasJsonp();
+        raw.value = res2.text;
+        setMsg('読み込み完了');
+        setStamp(res2.ts, res2.source);
+        saveLocal(res2.text);
+      } catch (e2) {
+        raw.value = '';
+        setMsg('エラー: ' + (e2.message || e2));
+        setStamp('', '');
+      }
+    }
+  }
+
+  /** ===== コピーボタン ===== */
+  document.getElementById('copyBtn').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(raw.value); setMsg('コピーしました'); }
+    catch { raw.focus(); raw.select(); setMsg(document.execCommand('copy') ? 'コピーしました（fallback）' : 'コピー失敗…'); }
+  });
+
+  /** ===== 起動処理 ===== */
+  (function init(){
+    // 0) ローカルキャッシュを即表示（体感高速化）
+    const prev = loadLocal();
+    if (prev?.text) {
+      raw.value = prev.text;
+      setMsg('前回結果を表示中…');
+      setStamp(prev.ts, 'local');
+    }
+    // 1) 新鮮データを取得して置き換え
+    loadFresh();
+
+    // 2) ウォームアップ（ping）でGASのコールドスタート抑制
+    setInterval(() => {
+      fetch(GAS_PING_URL).catch(()=>{});
+    }, PING_INTERVAL_MS);
+  })();
+</script>
