@@ -69,33 +69,46 @@
     <textarea id="textArea" readonly></textarea>
   </div>
 
-  <script>
-    const url = "https://script.google.com/macros/s/AKfycbyMCSeuN16OGb1kyni26BV9y6Fxj_ZgxOLjV2GIIeeQjDX3fDoqfRHmmhRXlPbh5YGw/exec?callback=handleData";
+<script>
+  const url = "https://script.google.com/macros/s/AKfycbyMCSeuN16OGb1kyni26BV9y6Fxj_ZgxOLjV2GIIeeQjDX3fDoqfRHmmhRXlPbh5YGw/exec?callback=handleData";
 
-    function handleData(data) {
-      document.getElementById("textArea").value = data.text || "";
-      document.getElementById("status").innerText = "読込完了";
-    }
+  function handleData(data) {
+    console.log("handleData called:", data);
+    document.getElementById("textArea").value = data.text || "";
+    document.getElementById("status").innerText = "読込完了";
+  }
 
-    function copyText() {
-      const textarea = document.getElementById("textArea");
+  function copyText() {
+    const textarea = document.getElementById("textArea");
 
-      navigator.clipboard.writeText(textarea.value)
-        .then(() => {
-          document.getElementById("status").innerText = "コピーしました！";
-        })
-        .catch(() => {
-          document.getElementById("status").innerText = "コピー失敗";
-        });
-    }
+    navigator.clipboard.writeText(textarea.value)
+      .then(() => {
+        document.getElementById("status").innerText = "コピーしました！";
+      })
+      .catch((err) => {
+        console.error("copy error:", err);
+        document.getElementById("status").innerText = "コピー失敗";
+      });
+  }
 
-    const script = document.createElement("script");
-    script.src = url;
-    script.onerror = function () {
-      document.getElementById("status").innerText = "読込失敗";
-    };
-    document.body.appendChild(script);
-  </script>
+  console.log("before script append:", url);
+
+  const script = document.createElement("script");
+  script.src = url;
+
+  script.onload = function () {
+    console.log("external script loaded");
+  };
+
+  script.onerror = function (e) {
+    console.error("script load error:", e);
+    document.getElementById("status").innerText = "読込失敗";
+  };
+
+  document.body.appendChild(script);
+
+  console.log("after script append");
+</script>
 
 </body>
 </html>
