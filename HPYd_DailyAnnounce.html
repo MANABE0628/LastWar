@@ -60,7 +60,6 @@
 
   <div class="container">
     <h2>HPYd Daily Announcement</h2>
-
     <div class="muted">［議事堂戦・戦域戦や隕鉄などの突発イベントは手入力ください］</div>
 
     <button onclick="copyText()">この内容をコピー</button>
@@ -69,46 +68,46 @@
     <textarea id="textArea" readonly></textarea>
   </div>
 
-<script>
-  const url = "https://script.googleusercontent.com/macros/echo?user_content_key=AWDtjMVZigZ4MnKruXvG0IL9FX2Xj2ekF4MbUGp80KRcgozUriTG59C8RZNJ1_vSvZN4JvVnrd5Q0xhWpJw-uFl2rwZLyP1f0IzmcKdUApIqzljl4U-SLpXEqHNmhHro0vykDOFcBCfiXalJhCoPEQbpIQ0E1LGcLfkp2v3dYn-c2DeFLqU8ARQ_oEAr3CRXMWE5kjU2MC4WITanZG5fydZiwnPWfxzg0HgYB8syBKD-Eg94ahomS01Wov0V0HvHXJE5YG96LFXboSbD0RM4tFfLKEeOFMAL39bXTOPTuT3_&lib=M8n0f-QvGfr0tEqYZCU3hn-mrDAFfAv3a";
+  <script>
+    const textArea = document.getElementById("textArea");
+    const status = document.getElementById("status");
 
-  function handleData(data) {
-    console.log("handleData called:", data);
-    document.getElementById("textArea").value = data.text || "";
-    document.getElementById("status").innerText = "読込完了";
-  }
+    const url = "https://script.googleusercontent.com/macros/echo?user_content_key=AWDtjMVZigZ4MnKruXvG0IL9FX2Xj2ekF4MbUGp80KRcgozUriTG59C8RZNJ1_vSvZN4JvVnrd5Q0xhWpJw-uFl2rwZLyP1f0IzmcKdUApIqzljl4U-SLpXEqHNmhHro0vykDOFcBCfiXalJhCoPEQbpIQ0E1LGcLfkp2v3dYn-c2DeFLqU8ARQ_oEAr3CRXMWE5kjU2MC4WITanZG5fydZiwnPWfxzg0HgYB8syBKD-Eg94ahomS01Wov0V0HvHXJE5YG96LFXboSbD0RM4tFfLKEeOFMAL39bXTOPTuT3_&lib=M8n0f-QvGfr0tEqYZCU3hn-mrDAFfAv3a&callback=handleData";
 
-  function copyText() {
-    const textarea = document.getElementById("textArea");
+    function handleData(data) {
+      console.log("handleData called:", data);
+      textArea.value = data.text || "";
+      status.innerText = "読込完了";
+    }
 
-    navigator.clipboard.writeText(textarea.value)
-      .then(() => {
-        document.getElementById("status").innerText = "コピーしました！";
-      })
-      .catch((err) => {
-        console.error("copy error:", err);
-        document.getElementById("status").innerText = "コピー失敗";
-      });
-  }
+    function copyText() {
+      navigator.clipboard.writeText(textArea.value)
+        .then(() => {
+          status.innerText = "コピーしました！";
+        })
+        .catch((err) => {
+          console.error("copy error:", err);
+          status.innerText = "コピー失敗";
+        });
+    }
 
-  console.log("before script append:", url);
+    window.handleData = handleData;
+    window.copyText = copyText;
 
-  const script = document.createElement("script");
-  script.src = url;
+    const script = document.createElement("script");
+    script.src = url;
 
-  script.onload = function () {
-    console.log("external script loaded");
-  };
+    script.onload = function () {
+      console.log("external script loaded");
+    };
 
-  script.onerror = function (e) {
-    console.error("script load error:", e);
-    document.getElementById("status").innerText = "読込失敗";
-  };
+    script.onerror = function (e) {
+      console.error("script load error:", e);
+      status.innerText = "読込失敗";
+    };
 
-  document.body.appendChild(script);
-
-  console.log("after script append");
-</script>
+    document.body.appendChild(script);
+  </script>
 
 </body>
 </html>
