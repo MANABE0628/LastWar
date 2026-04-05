@@ -1,113 +1,142 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Announcement</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HPYd Daily Announcement</title>
   <style>
     body {
-      font-family: sans-serif;
-      display: flex;
-      justify-content: center;
-      margin-top: 40px;
-      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      background: #f3f3f3;
+      font-family: Arial, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      color: #222;
     }
 
     .container {
-      width: 90%;
-      max-width: 600px;
-    }
-
-    h2 {
+      max-width: 900px;
+      margin: 50px auto 0;
       text-align: center;
-      margin-bottom: 16px;
     }
 
-    .muted {
+    h1 {
+      font-size: 46px;
+      margin-bottom: 30px;
+      font-weight: 700;
+    }
+
+    .subtext {
       color: #666;
-      font-size: 13px;
-      margin-bottom: 12px;
-      text-align: center;
+      font-size: 18px;
+      margin-bottom: 35px;
+    }
+
+    .copy-btn {
+      width: 100%;
+      max-width: 900px;
+      height: 72px;
+      font-size: 28px;
+      border: 1px solid #999;
+      border-radius: 2px;
+      background: #fff;
+      cursor: pointer;
+      margin-bottom: 25px;
+    }
+
+    .copy-btn:hover {
+      background: #f8f8f8;
+    }
+
+    .status {
+      text-align: left;
+      font-size: 18px;
+      margin: 0 auto 15px;
+      max-width: 900px;
+      color: #222;
+      min-height: 28px;
     }
 
     textarea {
       width: 100%;
-      height: 300px;
-      font-size: 14px;
+      max-width: 900px;
+      height: 420px;
+      font-size: 18px;
+      line-height: 1.7;
+      padding: 18px;
       box-sizing: border-box;
+      border: 1px solid #999;
+      border-radius: 2px;
       resize: vertical;
-      padding: 10px;
-    }
-
-    button {
-      margin-top: 10px;
-      margin-bottom: 8px;
-      padding: 10px;
-      width: 100%;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    #status {
-      display: inline-block;
-      margin-bottom: 10px;
-      font-size: 14px;
-      color: #333;
+      background: #fff;
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
-
   <div class="container">
-    <h2>HPYd Daily Announcement</h2>
-    <div class="muted">［議事堂戦・戦域戦や隕鉄などの突発イベントは手入力ください］</div>
+    <h1>HPYd Daily Announcement</h1>
 
-    <button onclick="copyText()">この内容をコピー</button>
-    <div id="status">読込中...</div>
+    <div class="subtext">
+      [議事堂戦・戦域戦や隕鉄などの突発イベントは手入力ください]
+    </div>
 
-    <textarea id="textArea" readonly></textarea>
+    <button class="copy-btn" onclick="copyText()">この内容をコピー</button>
+
+    <div id="status" class="status">読込中...</div>
+
+    <textarea id="announcement" readonly></textarea>
   </div>
 
   <script>
-    const textArea = document.getElementById("textArea");
-    const status = document.getElementById("status");
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxBVaB1gWgApq2i25lVqxuzC7j3GW2AujzAfBN32dwy0tY2JNz-rrOL8FkAjywz1gsF/exec";
 
-    const url = "https://script.googleusercontent.com/macros/echo?user_content_key=AWDtjMVZigZ4MnKruXvG0IL9FX2Xj2ekF4MbUGp80KRcgozUriTG59C8RZNJ1_vSvZN4JvVnrd5Q0xhWpJw-uFl2rwZLyP1f0IzmcKdUApIqzljl4U-SLpXEqHNmhHro0vykDOFcBCfiXalJhCoPEQbpIQ0E1LGcLfkp2v3dYn-c2DeFLqU8ARQ_oEAr3CRXMWE5kjU2MC4WITanZG5fydZiwnPWfxzg0HgYB8syBKD-Eg94ahomS01Wov0V0HvHXJE5YG96LFXboSbD0RM4tFfLKEeOFMAL39bXTOPTuT3_&lib=M8n0f-QvGfr0tEqYZCU3hn-mrDAFfAv3a&callback=handleData";
+    async function loadAnnouncement() {
+      const status = document.getElementById("status");
+      const textarea = document.getElementById("announcement");
 
-    function handleData(data) {
-      console.log("handleData called:", data);
-      textArea.value = data.text || "";
-      status.innerText = "読込完了";
+      try {
+        status.textContent = "読込中...";
+
+        const response = await fetch(GAS_URL);
+        if (!response.ok) {
+          throw new Error("HTTPエラー: " + response.status);
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error("データ取得失敗");
+        }
+
+        textarea.value = data.text || "";
+        status.textContent = "";
+      } catch (error) {
+        status.textContent = "読込失敗";
+        textarea.value = error.message || "データ取得に失敗しました。";
+      }
     }
 
-    function copyText() {
-      navigator.clipboard.writeText(textArea.value)
-        .then(() => {
-          status.innerText = "コピーしました！";
-        })
-        .catch((err) => {
-          console.error("copy error:", err);
-          status.innerText = "コピー失敗";
-        });
+    async function copyText() {
+      const textarea = document.getElementById("announcement");
+      const status = document.getElementById("status");
+
+      try {
+        await navigator.clipboard.writeText(textarea.value);
+        status.textContent = "コピーしました";
+        setTimeout(() => {
+          status.textContent = "";
+        }, 1500);
+      } catch (error) {
+        textarea.select();
+        document.execCommand("copy");
+        status.textContent = "コピーしました";
+        setTimeout(() => {
+          status.textContent = "";
+        }, 1500);
+      }
     }
 
-    window.handleData = handleData;
-    window.copyText = copyText;
-
-    const script = document.createElement("script");
-    script.src = url;
-
-    script.onload = function () {
-      console.log("external script loaded");
-    };
-
-    script.onerror = function (e) {
-      console.error("script load error:", e);
-      status.innerText = "読込失敗";
-    };
-
-    document.body.appendChild(script);
+    window.onload = loadAnnouncement;
   </script>
-
 </body>
 </html>
