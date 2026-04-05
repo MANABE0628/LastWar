@@ -10,37 +10,43 @@ body {
   justify-content: center;
   margin-top: 40px;
 }
-
 .container {
   width: 90%;
   max-width: 600px;
 }
-
 textarea {
   width: 100%;
   height: 300px;
   font-size: 14px;
 }
-
 button {
   margin-top: 10px;
   padding: 10px;
   width: 100%;
   font-size: 16px;
 }
+.muted {
+  color: #666;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+#status {
+  display: inline-block;
+  margin-left: 10px;
+  color: #333;
+  font-size: 14px;
+}
 </style>
 </head>
 
 <body>
-
 <div class="container">
   <h2>HPYd Daily Announcement</h2>
 
   <div class="muted">［議事堂戦・戦域戦や隕鉄などの突発イベントは手入力ください］</div>
 
- <button onclick="copyText()">この内容をコピー</button>
- <span id="status"></span> 
-
+  <button onclick="copyText()">この内容をコピー</button>
+  <span id="status">読込中...</span>
 
   <textarea id="textArea"></textarea>
 </div>
@@ -48,27 +54,42 @@ button {
 <script>
 const url = "https://script.google.com/macros/s/AKfycbyMCSeuN16OGb1kyni26BV9y6Fxj_ZgxOLjV2GIIeeQjDX3fDoqfRHmmhRXlPbh5YGw/exec";
 
+async function loadText() {
+  const status = document.getElementById("status");
+  const textarea = document.getElementById("textArea");
 
+  try {
+    const res = await fetch(url);
+    console.log("status:", res.status);
 
-fetch(url)
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("textArea").value = data.text;
-  });
+    const raw = await res.text();
+    console.log("raw response:", raw);
+
+    const data = JSON.parse(raw);
+    console.log("parsed data:", data);
+
+    textarea.value = data.text || "";
+    status.innerText = "読込完了";
+  } catch (err) {
+    console.error(err);
+    status.innerText = "読込失敗: " + err.message;
+  }
+}
 
 function copyText() {
   const textarea = document.getElementById("textArea");
-  textarea.select();
-  textarea.setSelectionRange(0, 99999); // スマホ対応
 
   navigator.clipboard.writeText(textarea.value)
     .then(() => {
       document.getElementById("status").innerText = "コピーしました！";
     })
-    .catch(() => {
+    .catch((err) => {
+      console.error(err);
       document.getElementById("status").innerText = "コピー失敗";
     });
 }
+
+loadText();
 </script>
 
 </body>
