@@ -1,96 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>Daily Announcement</title>
-<style>
-body {
-  font-family: sans-serif;
-  display: flex;
-  justify-content: center;
-  margin-top: 40px;
-}
-.container {
-  width: 90%;
-  max-width: 600px;
-}
-textarea {
-  width: 100%;
-  height: 300px;
-  font-size: 14px;
-}
-button {
-  margin-top: 10px;
-  padding: 10px;
-  width: 100%;
-  font-size: 16px;
-}
-.muted {
-  color: #666;
-  font-size: 13px;
-  margin-bottom: 10px;
-}
-#status {
-  display: inline-block;
-  margin-left: 10px;
-  color: #333;
-  font-size: 14px;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Announcement</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+      background: #f7f7f7;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 600px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .muted {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    textarea {
+      width: 100%;
+      height: 300px;
+      font-size: 14px;
+      box-sizing: border-box;
+      resize: vertical;
+      padding: 10px;
+    }
+
+    button {
+      margin-top: 10px;
+      margin-bottom: 8px;
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #status {
+      display: inline-block;
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: #333;
+    }
+  </style>
 </head>
-
 <body>
-<div class="container">
-  <h2>HPYd Daily Announcement</h2>
 
-  <div class="muted">［議事堂戦・戦域戦や隕鉄などの突発イベントは手入力ください］</div>
+  <div class="container">
+    <h2>HPYd Daily Announcement</h2>
 
-  <button onclick="copyText()">この内容をコピー</button>
-  <span id="status">読込中...</span>
+    <div class="muted">［議事堂戦・戦域戦や隕鉄などの突発イベントは手入力ください］</div>
 
-  <textarea id="textArea"></textarea>
-</div>
+    <button onclick="copyText()">この内容をコピー</button>
+    <div id="status">読込中...</div>
 
-<script>
-const url = "https://script.google.com/macros/s/AKfycbyMCSeuN16OGb1kyni26BV9y6Fxj_ZgxOLjV2GIIeeQjDX3fDoqfRHmmhRXlPbh5YGw/exec";
+    <textarea id="textArea" readonly></textarea>
+  </div>
 
-async function loadText() {
-  const status = document.getElementById("status");
-  const textarea = document.getElementById("textArea");
+  <script>
+    const url = "https://script.google.com/macros/s/AKfycbyMCSeuN16OGb1kyni26BV9y6Fxj_ZgxOLjV2GIIeeQjDX3fDoqfRHmmhRXlPbh5YGw/exec?callback=handleData";
 
-  try {
-    const res = await fetch(url);
-    console.log("status:", res.status);
+    function handleData(data) {
+      document.getElementById("textArea").value = data.text || "";
+      document.getElementById("status").innerText = "読込完了";
+    }
 
-    const raw = await res.text();
-    console.log("raw response:", raw);
+    function copyText() {
+      const textarea = document.getElementById("textArea");
 
-    const data = JSON.parse(raw);
-    console.log("parsed data:", data);
+      navigator.clipboard.writeText(textarea.value)
+        .then(() => {
+          document.getElementById("status").innerText = "コピーしました！";
+        })
+        .catch(() => {
+          document.getElementById("status").innerText = "コピー失敗";
+        });
+    }
 
-    textarea.value = data.text || "";
-    status.innerText = "読込完了";
-  } catch (err) {
-    console.error(err);
-    status.innerText = "読込失敗: " + err.message;
-  }
-}
-
-function copyText() {
-  const textarea = document.getElementById("textArea");
-
-  navigator.clipboard.writeText(textarea.value)
-    .then(() => {
-      document.getElementById("status").innerText = "コピーしました！";
-    })
-    .catch((err) => {
-      console.error(err);
-      document.getElementById("status").innerText = "コピー失敗";
-    });
-}
-
-loadText();
-</script>
+    const script = document.createElement("script");
+    script.src = url;
+    script.onerror = function () {
+      document.getElementById("status").innerText = "読込失敗";
+    };
+    document.body.appendChild(script);
+  </script>
 
 </body>
 </html>
