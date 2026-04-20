@@ -131,7 +131,7 @@
   </table>
 
   <script>
-    const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxrQMudMLzM4l3qjr8t0yCG4NBKqTUNV-u1LcgUdgx3ac-eMYdP4K4r_TPWEKNzZpWE/exec";
+    const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwpE3ewBq0UPlCbD7Va1YPRXRONMHVOOuZtxzXB9iCR9nZ4CloCtabvA-OZepRY3orS/exec";
     const API_TOKEN    = "absdo24365";
 
     let memberList = [];
@@ -172,7 +172,7 @@
       setBusy(true, "抽選中...");
       const form = document.getElementById("rankForm");
       const params = new URLSearchParams(new FormData(form));
-      params.append("action", "previewWeekAssignments");
+      params.append("action", "getWeekAssignments");
       params.append("token", API_TOKEN);
 
       // person 選択時のみ *_person を含める（空は送らない）
