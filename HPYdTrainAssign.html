@@ -175,6 +175,8 @@
       params.append("action", "getWeekAssignments");
       params.append("token", API_TOKEN);
 
+      console.log("送信パラメータ:", params.toString());
+
       // person 選択時のみ *_person を含める（空は送らない）
       document.querySelectorAll(".personSelect").forEach(sel => {
         const rankSel = sel.closest("tr").querySelector("select[name$='']") || null;
