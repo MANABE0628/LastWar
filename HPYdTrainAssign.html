@@ -172,7 +172,7 @@
       setBusy(true, "抽選中...");
       const form = document.getElementById("rankForm");
       const params = new URLSearchParams(new FormData(form));
-      params.append("action", "getWeekAssignments");
+      params.append("action", "previewWeekAssignments");
       params.append("token", API_TOKEN);
 
       console.log("送信パラメータ:", params.toString());
